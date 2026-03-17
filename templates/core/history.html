@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Query History - LLM SQL Analytics{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Query History</h2>
+    </div>
+    
+    {% if queries %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Generated SQL</th>
+                    <th>Database</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for query in queries %}
+                <tr>
+                    <td>{{ query.natural_language|truncatechars:60 }}</td>
+                    <td>
+                        <code style="font-size: 12px;">{{ query.generated_sql|truncatechars:40 }}</code>
+                    </td>
+                    <td>{{ query.connection.name }}</td>
+                    <td>
+                        {% if query.error %}
+                            <span class="status-badge status-disconnected">Error</span>
+                        {% else %}
+                            <span class="status-badge status-connected">Success</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ query.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% if query.error %}
+                <tr>
+                    <td colspan="5" style="color: var(--error); background: #fff5f5;">
+                        Error: {{ query.error }}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No query history yet. <a href="{% url 'query' %}">Run your first query</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Documents - LLM SQL Analytics{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Schema Documents</h2>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" style="margin-bottom: 32px;">
+        {% csrf_token %}
+        <input type="hidden" name="upload" value="1">
+        <h3 style="margin-bottom: 16px; color: var(--primary);">Upload Document</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Database Connection</label>
+                <select name="connection_id" class="form-select" required>
+                    <option value="">Select a database...</option>
+                    {% for conn in connections %}
+                    <option value="{{ conn.id }}">{{ conn.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Upload PDF or Text File</label>
+                <input type="file" name="file" class="form-input" accept=".pdf,.txt,.md" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Document</button>
+    </form>
+    
+    <form method="post" style="margin-bottom: 32px;">
+        {% csrf_token %}
+        <input type="hidden" name="search" value="1">
+        <h3 style="margin-bottom: 16px; color: var(--primary);">Semantic Search</h3>
+        <div class="search-box">
+            <input type="text" name="search_query" class="form-input" placeholder="Search for tables, columns, or concepts...">
+            <button type="submit" class="btn btn-accent">Search</button>
+        </div>
+    </form>
+    
+    {% if search_results %}
+    <div style="margin-bottom: 32px;">
+        <h3 style="margin-bottom: 16px; color: var(--primary);">Search Results</h3>
+        {% for result in search_results %}
+        <div class="card" style="background: var(--background);">
+            <h4 style="margin-bottom: 8px;">{{ result.document }}</h4>
+            <p style="color: var(--text-secondary); font-size: 13px;">Similarity: {{ result.similarity|floatformat:2 }}</p>
+            <p style="margin-top: 8px;">{{ result.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <h3 style="margin-bottom: 16px; color: var(--primary);">Uploaded Documents</h3>
+    {% if documents %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Connection</th>
+                    <th>Uploaded</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td>{{ doc.name }}</td>
+                    <td>{{ doc.connection.name }}</td>
+                    <td>{{ doc.uploaded_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <p>No documents uploaded yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

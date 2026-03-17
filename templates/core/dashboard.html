@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - LLM SQL Analytics{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Dashboard</h2>
+    </div>
+    <p>Welcome to LLM SQL Analytics. Use the navigation above to:</p>
+    <ul style="margin-top: 16px; margin-left: 24px;">
+        <li>Manage database connections</li>
+        <li>Query databases using natural language</li>
+        <li>Upload and search schema documentation</li>
+        <li>View query history</li>
+    </ul>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Connections</h3>
+            <a href="{% url 'connections' %}" class="btn btn-secondary">Manage</a>
+        </div>
+        {% if connections %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Host</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conn in connections %}
+                    <tr>
+                        <td>{{ conn.name }}</td>
+                        <td>{{ conn.host }}:{{ conn.port }}</td>
+                        <td>
+                            <span class="status-badge {% if conn.is_active %}status-connected{% else %}status-disconnected{% endif %}">
+                                {% if conn.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p>No connections yet. <a href="{% url 'connections' %}">Add one now</a></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Queries</h3>
+            <a href="{% url 'history' %}" class="btn btn-secondary">View All</a>
+        </div>
+        {% if recent_queries %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for query in recent_queries %}
+                    <tr>
+                        <td>{{ query.natural_language|truncatechars:50 }}</td>
+                        <td>{{ query.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p>No queries yet. <a href="{% url 'query' %}">Run your first query</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Quick Actions</h3>
+    </div>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <a href="{% url 'query' %}" class="btn btn-primary">Run Query</a>
+        <a href="{% url 'connections' %}" class="btn btn-accent">Add Connection</a>
+        <a href="{% url 'documents' %}" class="btn btn-secondary">Upload Document</a>
+    </div>
+</div>
+{% endblock %}
