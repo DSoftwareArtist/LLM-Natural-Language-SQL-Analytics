@@ -29,21 +29,25 @@
 ### Layout Structure
 
 **Header**
+
 - Application title: "LLM SQL Analytics"
 - Navigation: Dashboard, Query Interface, Schema Docs, Settings
 
 **Main Content Area**
+
 - Dashboard: Overview of connected databases and recent queries
 - Query Interface: Natural language input + SQL preview + results table
 - Schema Docs: List of uploaded documents with semantic search
 - Settings: Database connection configuration
 
 **Footer**
+
 - Version info and copyright
 
 ### Visual Design
 
 **Color Palette**
+
 - Primary: `#1E3A5F` (Deep Navy)
 - Secondary: `#3D5A80` (Slate Blue)
 - Accent: `#48CAE4` (Cyan)
@@ -56,11 +60,13 @@
 - Warning: `#FFC107` (Yellow)
 
 **Typography**
+
 - Headings: "Inter", sans-serif, 600 weight
 - Body: "Inter", sans-serif, 400 weight
 - Monospace (SQL): "JetBrains Mono", monospace
 
 **Spacing**
+
 - Base unit: 8px
 - Container max-width: 1200px
 - Card padding: 24px
@@ -69,23 +75,27 @@
 ### Components
 
 **Query Input Card**
+
 - Textarea for natural language input
 - "Generate SQL" button (primary style)
 - "Execute" button (accent style)
 - SQL preview panel with syntax highlighting
 
 **Results Table**
+
 - Sortable columns
 - Pagination for large results
 - Export to CSV option
 
 **Schema Doc Card**
+
 - Document name
 - Upload date
 - Preview snippet
 - Semantic search input
 
 **Database Connection Card**
+
 - Connection name
 - Database type indicator
 - Status indicator (connected/disconnected)
@@ -98,33 +108,39 @@
 ### Core Features
 
 #### 4.1 Database Connection Management
+
 - Add PostgreSQL database connections with connection details
 - Test database connectivity
 - Store connection configurations securely
 - Support multiple database connections
 
 #### 4.2 Schema Introspection
+
 - Automatically fetch table names and column information
 - Store schema in PostgreSQL with pgvector for semantic search
 - Support uploading schema documentation (PDF)
 
 #### 4.3 Natural Language to SQL
+
 - Accept natural language queries
 - Use LLM to convert natural language to SQL
 - Support SELECT, INSERT, UPDATE, DELETE operations
 - Include validation and error handling
 
 #### 4.4 Semantic Schema Search
+
 - Embed schema documentation using sentence-transformers
 - Store embeddings in pgvector
 - Search schema semantically to find relevant tables/columns
 
 #### 4.5 Query Execution
+
 - Execute generated SQL against target database
 - Return formatted results
 - Handle errors gracefully with user-friendly messages
 
 #### 4.6 Query History
+
 - Store all queries with timestamps
 - View past queries and their results
 - Re-run previous queries
@@ -192,20 +208,20 @@ QueryHistory
 
 ## 6. API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/connections/ | List all database connections |
-| POST | /api/connections/ | Add new database connection |
-| GET | /api/connections/{id}/ | Get connection details |
-| PUT | /api/connections/{id}/ | Update connection |
-| DELETE | /api/connections/{id}/ | Delete connection |
-| POST | /api/connections/{id}/test/ | Test connection |
-| GET | /api/connections/{id}/schema/ | Get database schema |
-| POST | /api/query/ | Execute natural language query |
-| GET | /api/history/ | Get query history |
-| POST | /api/docs/ | Upload schema document |
-| GET | /api/docs/ | List schema documents |
-| POST | /api/docs/search/ | Semantic search in documents |
+| Method | Endpoint                      | Description                    |
+| ------ | ----------------------------- | ------------------------------ |
+| GET    | /api/connections/             | List all database connections  |
+| POST   | /api/connections/             | Add new database connection    |
+| GET    | /api/connections/{id}/        | Get connection details         |
+| PUT    | /api/connections/{id}/        | Update connection              |
+| DELETE | /api/connections/{id}/        | Delete connection              |
+| POST   | /api/connections/{id}/test/   | Test connection                |
+| GET    | /api/connections/{id}/schema/ | Get database schema            |
+| POST   | /api/query/                   | Execute natural language query |
+| GET    | /api/history/                 | Get query history              |
+| POST   | /api/docs/                    | Upload schema document         |
+| GET    | /api/docs/                    | List schema documents          |
+| POST   | /api/docs/search/             | Semantic search in documents   |
 
 ---
 

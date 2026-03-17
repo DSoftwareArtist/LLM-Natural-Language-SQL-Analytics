@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from django.conf import settings
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from sentence_transformers import SentenceTransformer
@@ -122,13 +122,13 @@ class SQLGenerationService:
     @classmethod
     def get_llm(cls):
         if cls._llm is None:
-            api_key = os.environ.get('OPENAI_API_KEY', '')
+            api_key = os.environ.get('GROQ_API_KEY', '')
             if not api_key:
-                raise ValueError("OPENAI_API_KEY not set")
-            cls._llm = ChatOpenAI(
-                model='gpt-4',
+                raise ValueError("GROQ_API_KEY not set")
+            cls._llm = ChatGroq(
+                model='llama-3.3-70b-versatile',
                 temperature=0,
-                openai_api_key=api_key
+                api_key=api_key
             )
         return cls._llm
 
@@ -139,21 +139,28 @@ class SQLGenerationService:
         prompt = PromptTemplate(
             input_variables=["question", "schema"],
             template="""
-You are a SQL expert. Given a natural language question and a database schema, generate a valid PostgreSQL query.
+                You are a SQL expert. Given a natural language question and a database schema, generate a valid PostgreSQL query.
 
-Schema:
-{schema}
+                Schema:
+                {schema}
 
-Question: {question}
+                Question: {question}
 
-Generate only the SQL query, no explanation. If the question cannot be answered with the given schema, generate a query that returns an appropriate empty result.
-"""
-        )
+                Generate only the SQL query and format it as string, no explanation. If the question cannot be answered with the given schema, generate a query that returns an appropriate empty result.
+                """
+            )
         
         chain = LLMChain(llm=llm, prompt=prompt)
         result = chain.run(question=natural_language, schema=schema_info)
-        
-        return result.strip()
+        print('LLM Output:', result)
+        sql = result.strip()
+        if sql.lower().startswith('sql'):
+            sql = sql[3:].strip()
+        if sql.lower().startswith('```sql'):
+            sql = sql[6:].strip()
+        if sql.endswith('```'):
+            sql = sql[:-3].strip()
+        return sql
 
     @classmethod
     def format_schema_for_prompt(cls, schema: Dict[str, Any]) -> str:

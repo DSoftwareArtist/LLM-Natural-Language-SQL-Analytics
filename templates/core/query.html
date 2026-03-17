@@ -50,7 +50,7 @@
     
     {% if query_result.success %}
         <div class="alert alert-success">
-            Query executed successfully. {{ query_result.row_count|default:query_result.rows_affected|default:0 }} row(s) returned.
+            Query executed successfully. {% if query_result.row_count %}{{ query_result.row_count }}{% elif query_result.rows_affected %}{{ query_result.rows_affected }}{% else %}0{% endif %} row(s) returned.
         </div>
         
         {% if query_result.rows %}

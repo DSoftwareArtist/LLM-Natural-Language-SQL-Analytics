@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -84,7 +87,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 SENTENCE_TRANSFORMER_MODEL = os.environ.get('SENTENCE_TRANSFORMER_MODEL', 'all-MiniLM-L6-v2')
 
 PGVECTOR_CONNECTION = {
