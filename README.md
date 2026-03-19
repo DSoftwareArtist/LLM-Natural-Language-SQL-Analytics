@@ -1,4 +1,4 @@
-# LLM Natural Language SQL Analytics - Specification
+# LLM Natural Language SQL Analytics
 
 ## Overview
 
