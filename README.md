@@ -3,7 +3,7 @@
 ## Overview
 
 
-A system that allows users to query structured databases using natural language. The system converts natural language questions into SQL queries, executes them against connected databases, and returns results. Includes semantic search over database schema documentation using pgvector.
+A system that allows users to query structured databases using natural language. The system converts natural language questions into SQL queries, executes, and returns results. Includes semantic search over database schema documentation using pgvector.
 
 <img width="987" height="749" alt="Screenshot 2026-03-19 at 5 46 10 PM" src="https://github.com/user-attachments/assets/369bb41a-2665-452b-ad1d-712f39da7cb7" />
 
