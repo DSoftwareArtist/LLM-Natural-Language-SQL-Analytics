@@ -55,10 +55,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'llm_sql_analytics.wsgi.application'
 
+DATABASE_HOST = os.environ.get('PGVECTOR_DB_HOST', 'localhost')
+DATABASE_PORT = os.environ.get('PGVECTOR_DB_PORT', '5432')
+DATABASE_NAME = os.environ.get('PGVECTOR_DB_NAME', 'llm_analytics')
+DATABASE_USER = os.environ.get('PGVECTOR_DB_USER', 'postgres')
+DATABASE_PASSWORD = os.environ.get('PGVECTOR_DB_PASSWORD', 'postgres')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
     }
 }
 
@@ -89,11 +99,3 @@ REST_FRAMEWORK = {
 
 SENTENCE_TRANSFORMER_MODEL = os.environ.get('SENTENCE_TRANSFORMER_MODEL', 'all-MiniLM-L6-v2')
 
-PGVECTOR_CONNECTION = {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': os.environ.get('PGVECTOR_DB_NAME', 'llm_analytics'),
-    'USER': os.environ.get('PGVECTOR_DB_USER', 'postgres'),
-    'PASSWORD': os.environ.get('PGVECTOR_DB_PASSWORD', 'postgres'),
-    'HOST': os.environ.get('PGVECTOR_DB_HOST', 'localhost'),
-    'PORT': os.environ.get('PGVECTOR_DB_PORT', '5432'),
-}
