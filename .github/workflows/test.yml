@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_llm_analytics
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install pgvector
+        run: |
+          pip install pgvector
+          sudo apt-get update
+          sudo apt-get install -y postgresql-15-pgvector
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          DATABASE_HOST=localhost
+          DATABASE_PORT=5432
+          DATABASE_NAME=test_llm_analytics
+          DATABASE_USER=postgres
+          DATABASE_PASSWORD=postgres
+          GROQ_API_KEY=test_key
+          PGVECTOR_DB_NAME=test_llm_analytics
+          PGVECTOR_DB_USER=postgres
+          PGVECTOR_DB_PASSWORD=postgres
+          PGVECTOR_DB_HOST=localhost
+          PGVECTOR_DB_PORT=5432
+          SENTENCE_TRANSFORMER_MODEL=all-MiniLM-L6-v2
+          EOF
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+        env:
+          DJANGO_SECRET_KEY: test_secret_key
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: test_llm_analytics
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
+
+      - name: Run tests
+        run: |
+          python manage.py test core.tests --verbosity=2
+        env:
+          DJANGO_SECRET_KEY: test_secret_key
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: test_llm_analytics
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
