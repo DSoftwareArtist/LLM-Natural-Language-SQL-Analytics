@@ -1,105 +1,92 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-
-{% block title %}Query - LLM SQL Analytics{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load custom_filters %} {% block title %}Query - LLM
+SQL Analytics{% endblock %} {% block content %}
 <div class="card">
-    <div class="card-header">
-        <h2 class="card-title">Natural Language Query</h2>
+  <div class="card-header">
+    <h2 class="card-title">Natural Language Query</h2>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Your Question</label>
+      <textarea
+        name="natural_language"
+        class="form-textarea"
+        style="min-height: 120px"
+        placeholder="e.g., Show me all users who signed up in the last month"
+        required
+      ></textarea>
     </div>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label class="form-label">Database Connection</label>
-            <select name="connection_id" class="form-select" required>
-                <option value="">Select a database...</option>
-                {% for conn in connections %}
-                <option value="{{ conn.id }}">{{ conn.name }} ({{ conn.host }}/{{ conn.database }})</option>
-                {% endfor %}
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">Your Question</label>
-            <textarea name="natural_language" class="form-textarea" style="min-height: 120px;" placeholder="e.g., Show me all users who signed up in the last month" required></textarea>
-        </div>
-        
-        <div style="display: flex; gap: 12px;">
-            <button type="submit" name="generate" class="btn btn-primary">Generate SQL</button>
-            <button type="submit" name="execute" class="btn btn-accent">Generate & Execute</button>
-        </div>
-    </form>
+
+    <div style="display: flex; gap: 12px">
+      <button type="submit" name="generate" class="btn btn-primary">
+        Generate SQL
+      </button>
+      <button type="submit" name="execute" class="btn btn-accent">
+        Generate & Execute
+      </button>
+    </div>
+  </form>
 </div>
 
 {% if generated_sql %}
 <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Generated SQL</h3>
-    </div>
-    <div class="sql-preview">{{ generated_sql }}</div>
+  <div class="card-header">
+    <h3 class="card-title">Generated SQL</h3>
+  </div>
+  <div class="sql-preview">{{ generated_sql }}</div>
 </div>
-{% endif %}
-
-{% if query_result %}
+{% endif %} {% if query_result %}
 <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Query Result</h3>
-    </div>
-    
-    {% if query_result.success %}
-        <div class="alert alert-success">
-            Query executed successfully. {% if query_result.row_count %}{{ query_result.row_count }}{% elif query_result.rows_affected %}{{ query_result.rows_affected }}{% else %}0{% endif %} row(s) returned.
-        </div>
-        
-        {% if query_result.rows %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            {% for col in query_result.columns %}
-                            <th>{{ col }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in query_result.rows %}
-                        <tr>
-                            {% for col in query_result.columns %}
-                            <td>{{ row|get_item:col }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="alert alert-error">
-            <strong>Error:</strong> {{ query_result.message }}
-        </div>
-    {% endif %}
-</div>
-{% endif %}
+  <div class="card-header">
+    <h3 class="card-title">Query Result</h3>
+  </div>
 
-{% if not connections %}
-<div class="card">
-    <div class="empty-state">
-        <div class="empty-state-icon">⚠️</div>
-        <p>No active database connections. <a href="{% url 'connections' %}">Add a connection</a> first.</p>
-    </div>
-</div>
-{% endif %}
-{% endblock %}
+  {% if query_result.success %}
+  <div class="alert alert-success">
+    Query executed successfully. {% if query_result.row_count %}{{
+    query_result.row_count }}{% elif query_result.rows_affected %}{{
+    query_result.rows_affected }}{% else %}0{% endif %} row(s) returned.
+  </div>
 
-{% block extra_js %}
+  {% if query_result.rows %}
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          {% for col in query_result.columns %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in query_result.rows %}
+        <tr>
+          {% for col in query_result.columns %}
+          <td>{{ row|get_item:col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %} {% else %}
+  <div class="alert alert-error">
+    <strong>Error:</strong> {{ query_result.message }}
+  </div>
+  {% endif %}
+</div>
+{% endif %} {% endblock %} {% block extra_js %}
 <script>
-document.querySelector('select[name="connection_id"]').addEventListener('change', function() {
-    const textarea = document.querySelector('textarea[name="natural_language"]');
-    if (this.value) {
+  document
+    .querySelector('select[name="connection_id"]')
+    .addEventListener("change", function () {
+      const textarea = document.querySelector(
+        'textarea[name="natural_language"]',
+      );
+      if (this.value) {
         textarea.focus();
-    }
-});
+      }
+    });
 </script>
 {% endblock %}
