@@ -1,6 +1,6 @@
 import os
-import json
-from typing import Optional, List, Dict, Any
+from datetime import datetime, date
+from typing import List, Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from django.conf import settings
@@ -11,22 +11,7 @@ from sentence_transformers import SentenceTransformer
 
 
 class DatabaseService:
-    @staticmethod
-    def test_connection(connection_data: Dict[str, Any]) -> Dict[str, Any]:
-        try:
-            conn = psycopg2.connect(
-                host=connection_data['host'],
-                port=connection_data['port'],
-                database=connection_data['database'],
-                user=connection_data['username'],
-                password=connection_data['password'],
-                connect_timeout=5
-            )
-            conn.close()
-            return {'success': True, 'message': 'Connection successful'}
-        except Exception as e:
-            return {'success': False, 'message': str(e)}
-
+    
     @staticmethod
     def get_connection(connection_data: Dict[str, Any]):
         return psycopg2.connect(
@@ -68,6 +53,17 @@ class DatabaseService:
 
     @staticmethod
     def execute_query(connection_data: Dict[str, Any], sql: str) -> Dict[str, Any]:
+        def convert_row(row):
+            result = {}
+            for key, value in dict(row).items():
+                if isinstance(value, (datetime, date)):
+                    result[key] = value.isoformat()
+                elif isinstance(value, bytes):
+                    result[key] = value.decode('utf-8', errors='replace')
+                else:
+                    result[key] = value
+            return result
+        
         try:
             with DatabaseService.get_connection(connection_data) as conn:
                 with conn.cursor() as cursor:
@@ -78,7 +74,7 @@ class DatabaseService:
                         return {
                             'success': True,
                             'columns': columns,
-                            'rows': [dict(r) for r in results],
+                            'rows': [convert_row(r) for r in results],
                             'row_count': len(results)
                         }
                     else:
