@@ -12,7 +12,7 @@ jobs:
     
     services:
       postgres:
-        image: postgres:15
+        image: ankane/pgvector
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -37,12 +37,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install pgvector
-        run: |
-          pip install pgvector
-          sudo apt-get update
-          sudo apt-get install -y postgresql-15-pgvector
 
       - name: Create .env file
         run: |
